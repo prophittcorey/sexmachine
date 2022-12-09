@@ -1,5 +1,7 @@
 package sexmachine
 
+import "strings"
+
 // ISO/IEC 5218 (see: https://en.wikipedia.org/wiki/ISO/IEC_5218)
 const (
 	Unknown = iota
@@ -23,4 +25,16 @@ func (c *Classifier) Assume(name string) (int, float64) {
 // New creates a brand new classifier.
 func New() *Classifier {
 	return &Classifier{}
+}
+
+func parsename(name string) string {
+	if fields := strings.Fields(name); len(fields) > 0 {
+		return normalize(fields[0])
+	}
+
+	return ""
+}
+
+func normalize(s string) string {
+	return strings.TrimSpace(strings.ToLower(s))
 }
