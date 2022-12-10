@@ -18,7 +18,7 @@ type Classifier struct {
 // Train labels data and adds it to the classifier.
 func (c *Classifier) Train(label int, names ...string) {
 	for _, name := range names {
-		c.Freqs[label][name]++
+		c.Freqs[label][normalize(name)]++
 		c.Total++
 	}
 }
