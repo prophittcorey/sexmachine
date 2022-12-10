@@ -17,8 +17,8 @@ type Classifier struct {
 func (c *Classifier) Train(label int, names ...string) {
 }
 
-// Assume takes a name and attempts to guess its sex using the classifier.
-func (c *Classifier) Assume(name string) (int, float64) {
+// Predict takes a name and attempts to predict the person's sex using the classifier.
+func (c *Classifier) Predict(name string) (int, float64) {
 	return 0, 0.0
 }
 
