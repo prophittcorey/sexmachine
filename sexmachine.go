@@ -31,14 +31,15 @@ func (c *Classifier) Train(label sex, names ...string) {
 	}
 }
 
-// Predict takes a name and attempts to predict the person's sex using the classifier.
+// Predict takes a name and attempts to predict the person's sex
+// based on the data it was trained with.
 func (c *Classifier) Predict(name string) (sex, float64) {
 	name = parsename(name)
 
 	return 0, 0.0
 }
 
-// New creates a new classifier.
+// New creates a new classifier that is ready to be used.
 func New() *Classifier {
 	return &Classifier{
 		data: map[sex]names{
