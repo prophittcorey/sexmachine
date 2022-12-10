@@ -1,6 +1,8 @@
 package sexmachine
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestParseName(t *testing.T) {
 	if name := parsename(""); name != "" {
