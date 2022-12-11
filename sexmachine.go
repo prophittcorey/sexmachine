@@ -1,13 +1,16 @@
+// Package sexmachine enables you to easily train and classify names to sexes.
 package sexmachine
 
-import "strings"
+import (
+	"strings"
+)
 
 const (
 	Male = iota
 	Female
 )
 
-const defaultProb = 0.00000000001
+const defaultProb = 0.000001
 
 type sex = int
 
@@ -16,9 +19,9 @@ type names struct {
 	total float64
 }
 
-func (n names) probability(name string) float64 {
-	if val, ok := n.freqs(name); ok {
-		return value / n.total
+func (n *names) probability(name string) float64 {
+	if val, ok := n.freqs[name]; ok {
+		return val / n.total
 	}
 
 	return defaultProb
@@ -26,7 +29,7 @@ func (n names) probability(name string) float64 {
 
 // Classifier is used to store labeled data for classification.
 type Classifier struct {
-	data map[sex]names
+	data map[sex]*names
 }
 
 func (c *Classifier) priors() []float64 {
@@ -56,17 +59,40 @@ func (c *Classifier) Train(label sex, names ...string) {
 func (c *Classifier) Predict(name string) (sex, float64) {
 	name = parsename(name)
 
-	return 0, 0.0
+	scores := []float64{0.0, 0.0}
+	priors := c.priors()
+	total := 0.0
+
+	scores[Male] = priors[Male] * c.data[Male].probability(name)
+
+	total += scores[Male]
+
+	scores[Female] = priors[Female] * c.data[Female].probability(name)
+
+	total += scores[Female]
+
+	if total > 0 {
+		scores[Male] /= total
+		scores[Female] /= total
+	}
+
+	if scores[Male] > scores[Female] {
+		return Male, scores[Male]
+	}
+
+	// NOTE: What about an "ambiguous" score?
+
+	return Female, scores[Female]
 }
 
 // New creates a new classifier that is ready to be used.
 func New() *Classifier {
 	return &Classifier{
-		data: map[sex]names{
-			Male: names{
+		data: map[sex]*names{
+			Male: &names{
 				freqs: map[string]float64{},
 			},
-			Female: names{
+			Female: &names{
 				freqs: map[string]float64{},
 			},
 		},

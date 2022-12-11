@@ -21,11 +21,11 @@ func TestParseName(t *testing.T) {
 func TestClassification(t *testing.T) {
 	classifier := New()
 
-	classifier.Train(Male, "bob", "john", "tim")
-	classifier.Train(Female, "sara", "sally", "abbey")
+	classifier.Train(Male, "bob", "john", "tim", "tom", "alex", "alex", "joey")
+	classifier.Train(Female, "sara", "sally", "abbey", "alex", "joey")
 
-	if sex, prob := classifier.Predict("Bob"); sex != Male {
-		t.Fatalf("failed to classify Bob as Male; got %v at %f", sex, prob)
+	if sex, prob := classifier.Predict("Alex"); sex != Male {
+		t.Fatalf("failed to classify Alex as Male; got %v at %f", sex, prob)
 	}
 
 	if sex, prob := classifier.Predict("Sara"); sex != Female {
