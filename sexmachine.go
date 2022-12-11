@@ -2,6 +2,8 @@
 package sexmachine
 
 import (
+	"bytes"
+	"encoding/gob"
 	"strings"
 )
 
@@ -19,6 +21,22 @@ type names struct {
 	total float64
 }
 
+func (n names) GobEncode() ([]byte, error) {
+	w := &bytes.Buffer{}
+
+	encoder := gob.NewEncoder(w)
+
+	if err := encoder.Encode(n.freqs); err != nil {
+		return nil, err
+	}
+
+	if err := encoder.Encode(n.total); err != nil {
+		return nil, err
+	}
+
+	return w.Bytes(), nil
+}
+
 func (n names) probability(name string) float64 {
 	if val, ok := n.freqs[name]; ok {
 		return val / n.total
@@ -30,6 +48,18 @@ func (n names) probability(name string) float64 {
 // Classifier is used to store labeled data for classification.
 type Classifier struct {
 	data map[sex]*names
+}
+
+func (c Classifier) GobEncode() ([]byte, error) {
+	w := &bytes.Buffer{}
+
+	encoder := gob.NewEncoder(w)
+
+	if err := encoder.Encode(c.data); err != nil {
+		return nil, err
+	}
+
+	return w.Bytes(), nil
 }
 
 // Train labels data and adds it to the classifier.
