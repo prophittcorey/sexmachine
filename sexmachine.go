@@ -2,10 +2,8 @@ package sexmachine
 
 import "strings"
 
-// ISO/IEC 5218 (see: https://en.wikipedia.org/wiki/ISO/IEC_5218)
 const (
-	Unknown = iota
-	Male
+	Male = iota
 	Female
 )
 
@@ -13,12 +11,24 @@ type sex = int
 
 type names struct {
 	freqs map[string]float64
-	total int
+	total float64
 }
 
 // Classifier is used to store labeled data for classification.
 type Classifier struct {
 	data map[sex]names
+}
+
+func (c *Classifier) priors() []float64 {
+	mprior := c.data[Male].total
+	fprior := c.data[Female].total
+
+	if total := c.data[Male].total + c.data[Female].total; total > 0 {
+		mprior /= total
+		fprior /= total
+	}
+
+	return []float64{mprior, fprior}
 }
 
 // Train labels data and adds it to the classifier.
