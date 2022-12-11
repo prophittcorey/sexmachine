@@ -7,11 +7,21 @@ const (
 	Female
 )
 
+const defaultProb = 0.00000000001
+
 type sex = int
 
 type names struct {
 	freqs map[string]float64
 	total float64
+}
+
+func (n names) probability(name string) float64 {
+	if val, ok := n.freqs(name); ok {
+		return value / n.total
+	}
+
+	return defaultProb
 }
 
 // Classifier is used to store labeled data for classification.
