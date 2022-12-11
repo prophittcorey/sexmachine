@@ -4,6 +4,7 @@ package sexmachine
 import (
 	"bytes"
 	"encoding/gob"
+	"os"
 	"strings"
 )
 
@@ -70,6 +71,30 @@ func (c *Classifier) Train(label sex, names ...string) {
 			d.total++
 		}
 	}
+}
+
+// Load takes a classifier that was dumped via Save and loads it.
+func (c *Classifier) Load(file string) error {
+	return nil
+}
+
+// Save dumps the classifier to a file that can be loaded later via Load.
+func (c Classifier) Save(file string) error {
+	f, err := os.OpenFile(file, os.O_WRONLY|os.O_CREATE, 0644)
+
+	if err != nil {
+		return err
+	}
+
+	defer f.Close()
+
+	enc := gob.NewEncoder(f)
+
+	if err := enc.Encode(&c); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (c Classifier) priors() []float64 {
