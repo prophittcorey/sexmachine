@@ -19,7 +19,7 @@ type names struct {
 	total float64
 }
 
-func (n *names) probability(name string) float64 {
+func (n names) probability(name string) float64 {
 	if val, ok := n.freqs[name]; ok {
 		return val / n.total
 	}
@@ -32,7 +32,17 @@ type Classifier struct {
 	data map[sex]*names
 }
 
-func (c *Classifier) priors() []float64 {
+// Train labels data and adds it to the classifier.
+func (c *Classifier) Train(label sex, names ...string) {
+	for _, name := range names {
+		if d, ok := c.data[label]; ok {
+			d.freqs[normalize(name)]++
+			d.total++
+		}
+	}
+}
+
+func (c Classifier) priors() []float64 {
 	mprior := c.data[Male].total
 	fprior := c.data[Female].total
 
@@ -44,19 +54,9 @@ func (c *Classifier) priors() []float64 {
 	return []float64{mprior, fprior}
 }
 
-// Train labels data and adds it to the classifier.
-func (c *Classifier) Train(label sex, names ...string) {
-	for _, name := range names {
-		if d, ok := c.data[label]; ok {
-			d.freqs[normalize(name)]++
-			d.total++
-		}
-	}
-}
-
 // Predict takes a name and attempts to predict the person's sex
 // based on the data it was trained with.
-func (c *Classifier) Predict(name string) (sex, float64) {
+func (c Classifier) Predict(name string) (sex, float64) {
 	name = parsename(name)
 
 	scores := []float64{0.0, 0.0}
