@@ -18,6 +18,17 @@ func TestParseName(t *testing.T) {
 	}
 }
 
+func TestUnknowns(t *testing.T) {
+	classifier := New()
+
+	classifier.Train(Male, "bob", "john", "tim", "tom", "alex", "alex", "joey")
+	classifier.Train(Female, "sara", "sally", "abbey", "alex", "joey")
+
+	if sex, prob := classifier.Predict("Maximus"); sex != Unknown {
+		t.Fatalf("failed to classify an unknown; got %v at %f", Sex(sex), prob)
+	}
+}
+
 func TestClassification(t *testing.T) {
 	classifier := New()
 
@@ -25,11 +36,11 @@ func TestClassification(t *testing.T) {
 	classifier.Train(Female, "sara", "sally", "abbey", "alex", "joey")
 
 	if sex, prob := classifier.Predict("Alex"); sex != Male {
-		t.Fatalf("failed to classify Alex as Male; got %v at %f", sex, prob)
+		t.Fatalf("failed to classify Alex as Male; got %v at %f", Sex(sex), prob)
 	}
 
 	if sex, prob := classifier.Predict("Sara"); sex != Female {
-		t.Fatalf("failed to classify Sara as Female; got %v at %f", sex, prob)
+		t.Fatalf("failed to classify Sara as Female; got %v at %f", Sex(sex), prob)
 	}
 }
 
@@ -41,11 +52,11 @@ func TestLoad(t *testing.T) {
 	}
 
 	if sex, prob := classifier.Predict("Alex"); sex != Male {
-		t.Fatalf("failed to classify Alex as Male; got %v at %f", sex, prob)
+		t.Fatalf("failed to classify Alex as Male; got %v at %f", Sex(sex), prob)
 	}
 
 	if sex, prob := classifier.Predict("Sara"); sex != Female {
-		t.Fatalf("failed to classify Sara as Female; got %v at %f", sex, prob)
+		t.Fatalf("failed to classify Sara as Female; got %v at %f", Sex(sex), prob)
 	}
 }
 
@@ -74,10 +85,10 @@ func TestSuite(t *testing.T) {
 	/* test */
 
 	if sex, prob := classifier.Predict("Joey"); sex != Male {
-		t.Fatalf("failed to classify Joey as Male; got %v at %f", sex, prob)
+		t.Fatalf("failed to classify Joey as Male; got %v at %f", Sex(sex), prob)
 	}
 
 	if sex, prob := classifier.Predict("tara"); sex != Female {
-		t.Fatalf("failed to classify Tara as Female; got %v at %f", sex, prob)
+		t.Fatalf("failed to classify Tara as Female; got %v at %f", Sex(sex), prob)
 	}
 }
