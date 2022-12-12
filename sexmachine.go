@@ -12,6 +12,7 @@ import (
 const (
 	Male = iota
 	Female
+	Unknown
 )
 
 const defaultProb = 0.000001
@@ -179,6 +180,18 @@ func New() *Classifier {
 				freqs: map[string]float64{},
 			},
 		},
+	}
+}
+
+// Sex converts a sex's integer representation to a string.
+func Sex(s sex) string {
+	switch s {
+	case Male:
+		return "male"
+	case Female:
+		return "female"
+	default:
+		return "unknown"
 	}
 }
 
