@@ -38,6 +38,16 @@ func (n names) GobEncode() ([]byte, error) {
 	return w.Bytes(), nil
 }
 
+func (n *names) GobDecode(buf []byte) error {
+	decoder := gob.NewDecoder(bytes.NewBuffer(buf))
+
+	if err := decoder.Decode(&n.freqs); err != nil {
+		return err
+	}
+
+	return decoder.Decode(&n.total)
+}
+
 func (n names) probability(name string) float64 {
 	if val, ok := n.freqs[name]; ok {
 		return val / n.total
@@ -63,6 +73,10 @@ func (c Classifier) GobEncode() ([]byte, error) {
 	return w.Bytes(), nil
 }
 
+func (c *Classifier) GobDecode(buf []byte) error {
+	return gob.NewDecoder(bytes.NewBuffer(buf)).Decode(&c.data)
+}
+
 // Train labels data and adds it to the classifier.
 func (c *Classifier) Train(label sex, names ...string) {
 	for _, name := range names {
@@ -75,6 +89,18 @@ func (c *Classifier) Train(label sex, names ...string) {
 
 // Load takes a classifier that was dumped via Save and loads it.
 func (c *Classifier) Load(file string) error {
+	f, err := os.Open(file)
+
+	if err != nil {
+		return err
+	}
+
+	defer f.Close()
+
+	if err := gob.NewDecoder(f).Decode(c); err != nil {
+		return err
+	}
+
 	return nil
 }
 

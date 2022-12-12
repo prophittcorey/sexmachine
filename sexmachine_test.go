@@ -32,3 +32,19 @@ func TestClassification(t *testing.T) {
 		t.Fatalf("failed to classify Sara as Female; got %v at %f", sex, prob)
 	}
 }
+
+func TestLoad(t *testing.T) {
+	classifier := New()
+
+	if err := classifier.Load("testdata/classifier.test.bin"); err != nil {
+		t.Fatalf("failed to load classifier; %s", err)
+	}
+
+	if sex, prob := classifier.Predict("Alex"); sex != Male {
+		t.Fatalf("failed to classify Alex as Male; got %v at %f", sex, prob)
+	}
+
+	if sex, prob := classifier.Predict("Sara"); sex != Female {
+		t.Fatalf("failed to classify Sara as Female; got %v at %f", sex, prob)
+	}
+}
