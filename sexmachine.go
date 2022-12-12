@@ -4,6 +4,7 @@ package sexmachine
 import (
 	"bytes"
 	"encoding/gob"
+	"io"
 	"os"
 	"strings"
 )
@@ -87,9 +88,15 @@ func (c *Classifier) Train(label sex, names ...string) {
 	}
 }
 
-// Load takes a classifier that was dumped via Save and loads it.
-func (c *Classifier) Load(file string) error {
-	f, err := os.Open(file)
+// Load takes an io.Reader and decodes it. This can be used to read a
+// classifier from a file, virtual file, bytes, etc.
+func (c *Classifier) Load(reader io.Reader) error {
+	return gob.NewDecoder(reader).Decode(c)
+}
+
+// LoadFromFile is a shortcut for
+func (c *Classifier) LoadFromFile(file string) error {
+	f, err := os.Open("testdata/classifier.test.bin")
 
 	if err != nil {
 		return err
@@ -97,11 +104,7 @@ func (c *Classifier) Load(file string) error {
 
 	defer f.Close()
 
-	if err := gob.NewDecoder(f).Decode(c); err != nil {
-		return err
-	}
-
-	return nil
+	return gob.NewDecoder(f).Decode(c)
 }
 
 // Save dumps the classifier to a file that can be loaded later via Load.
