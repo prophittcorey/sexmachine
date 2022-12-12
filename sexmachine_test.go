@@ -48,3 +48,36 @@ func TestLoad(t *testing.T) {
 		t.Fatalf("failed to classify Sara as Female; got %v at %f", sex, prob)
 	}
 }
+
+func TestSuite(t *testing.T) {
+	classifier := New()
+
+	/* train */
+
+	classifier.Train(Male, "joey", "joey", "joey", "nick", "sam", "brent")
+	classifier.Train(Female, "tory", "tara", "joey", "sara", "joey")
+
+	/* save */
+
+	if err := classifier.SaveFile("/tmp/classifier-test.bin"); err != nil {
+		t.Fatalf("failed to write test file; %s", err)
+	}
+
+	/* load */
+
+	classifier = New()
+
+	if err := classifier.LoadFile("/tmp/classifier-test.bin"); err != nil {
+		t.Fatalf("failed to load test file; %s", err)
+	}
+
+	/* test */
+
+	if sex, prob := classifier.Predict("Joey"); sex != Male {
+		t.Fatalf("failed to classify Joey as Male; got %v at %f", sex, prob)
+	}
+
+	if sex, prob := classifier.Predict("tara"); sex != Female {
+		t.Fatalf("failed to classify Tara as Female; got %v at %f", sex, prob)
+	}
+}
