@@ -94,9 +94,9 @@ func (c *Classifier) Load(reader io.Reader) error {
 	return gob.NewDecoder(reader).Decode(c)
 }
 
-// LoadFromFile is a shortcut for
-func (c *Classifier) LoadFromFile(file string) error {
-	f, err := os.Open("testdata/classifier.test.bin")
+// LoadFile wraps Load.
+func (c *Classifier) LoadFile(file string) error {
+	f, err := os.Open(file)
 
 	if err != nil {
 		return err
@@ -107,8 +107,13 @@ func (c *Classifier) LoadFromFile(file string) error {
 	return gob.NewDecoder(f).Decode(c)
 }
 
-// Save dumps the classifier to a file that can be loaded later via Load.
-func (c Classifier) Save(file string) error {
+// Save serializes a classifier and writes it out to an io.Writer.
+func (c Classifier) Save(writer io.Writer) error {
+	return gob.NewEncoder(writer).Encode(&c)
+}
+
+// SaveFile wraps Save.
+func (c Classifier) SaveFile(file string) error {
 	f, err := os.OpenFile(file, os.O_WRONLY|os.O_CREATE, 0644)
 
 	if err != nil {
@@ -117,13 +122,7 @@ func (c Classifier) Save(file string) error {
 
 	defer f.Close()
 
-	enc := gob.NewEncoder(f)
-
-	if err := enc.Encode(&c); err != nil {
-		return err
-	}
-
-	return nil
+	return c.Save(f)
 }
 
 func (c Classifier) priors() []float64 {

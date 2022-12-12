@@ -36,7 +36,7 @@ func TestClassification(t *testing.T) {
 func TestLoad(t *testing.T) {
 	classifier := New()
 
-	if err := classifier.LoadFromFile("testdata/classifier.test.bin"); err != nil {
+	if err := classifier.LoadFile("testdata/classifier.test.bin"); err != nil {
 		t.Fatalf("failed to load classifier; %s", err)
 	}
 
