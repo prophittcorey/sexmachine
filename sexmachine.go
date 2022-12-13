@@ -188,11 +188,11 @@ func (c Classifier) Predict(name string) (sex, float64) {
 		scores[Female] /= total
 	}
 
+	// NOTE: What about an "ambiguous" score or an unknown name?
+
 	if scores[Male] > scores[Female] {
 		return Male, scores[Male]
 	}
-
-	// NOTE: What about an "ambiguous" score?
 
 	return Female, scores[Female]
 }
