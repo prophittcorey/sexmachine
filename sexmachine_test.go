@@ -29,6 +29,17 @@ func TestUnknowns(t *testing.T) {
 	}
 }
 
+func TestEqualProbability(t *testing.T) {
+	classifier := New()
+
+	classifier.Train(Male, "tim", "tom", "alex", "tim", "joey")
+	classifier.Train(Female, "sara", "sally", "abbey", "alex", "joey")
+
+	if sex, prob := classifier.Predict("Alex"); sex != Male {
+		t.Fatalf("failed to classify Alex as Male with equal probabilities; got %v at %f", Sex(sex), prob)
+	}
+}
+
 func TestClassification(t *testing.T) {
 	classifier := New()
 
