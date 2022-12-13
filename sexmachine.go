@@ -3,8 +3,10 @@ package sexmachine
 
 import (
 	"bytes"
+	"compress/gzip"
 	"encoding/gob"
 	"io"
+	"log"
 	"os"
 	"strings"
 )
@@ -92,7 +94,19 @@ func (c *Classifier) Train(label sex, names ...string) {
 // Load takes an io.Reader and decodes it. This can be used to read a
 // classifier from a file, virtual file, bytes, etc.
 func (c *Classifier) Load(reader io.Reader) error {
-	return gob.NewDecoder(reader).Decode(c)
+	gz, err := gzip.NewReader(reader)
+
+	if err != nil {
+		return err
+	}
+
+	decoder := gob.NewDecoder(gz)
+
+	if err := gz.Close(); err != nil {
+		return err
+	}
+
+	return decoder.Decode(c)
 }
 
 // LoadFile wraps Load.
@@ -103,14 +117,24 @@ func (c *Classifier) LoadFile(file string) error {
 		return err
 	}
 
-	defer f.Close()
+	defer (func() {
+		if err := f.Close(); err != nil {
+			log.Printf("warning: failed to close file; %s", err)
+		}
+	})()
 
-	return gob.NewDecoder(f).Decode(c)
+	return c.Load(f)
 }
 
 // Save serializes a classifier and writes it out to an io.Writer.
 func (c Classifier) Save(writer io.Writer) error {
-	return gob.NewEncoder(writer).Encode(&c)
+	gz := gzip.NewWriter(writer)
+
+	if err := gob.NewEncoder(gz).Encode(&c); err != nil {
+		return err
+	}
+
+	return gz.Close()
 }
 
 // SaveFile wraps Save.
@@ -121,7 +145,11 @@ func (c Classifier) SaveFile(file string) error {
 		return err
 	}
 
-	defer f.Close()
+	defer (func() {
+		if err := f.Close(); err != nil {
+			log.Printf("warning: failed to close file; %s", err)
+		}
+	})()
 
 	return c.Save(f)
 }
