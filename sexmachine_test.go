@@ -85,7 +85,7 @@ func TestSuite(t *testing.T) {
 
 	/* save */
 
-	if err := classifier.SaveFile("/tmp/classifier-test.bin"); err != nil {
+	if err := classifier.SaveFile("/tmp/sexmachine.gob.gz"); err != nil {
 		t.Fatalf("failed to write test file; %s", err)
 	}
 
@@ -93,7 +93,7 @@ func TestSuite(t *testing.T) {
 
 	classifier = New()
 
-	if err := classifier.LoadFile("/tmp/classifier-test.bin"); err != nil {
+	if err := classifier.LoadFile("/tmp/sexmachine.gob.gz"); err != nil {
 		t.Fatalf("failed to load test file; %s", err)
 	}
 
