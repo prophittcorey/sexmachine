@@ -52,6 +52,14 @@ func (n *names) GobDecode(buf []byte) error {
 	return decoder.Decode(&n.total)
 }
 
+func (n names) has(name string) bool {
+	if _, ok := n.freqs[name]; ok {
+		return true
+	}
+
+	return false
+}
+
 func (n names) probability(name string) float64 {
 	if val, ok := n.freqs[name]; ok {
 		return val / n.total
@@ -181,30 +189,34 @@ func (c Classifier) priors() []float64 {
 func (c Classifier) Predict(name string) (sex, float64) {
 	name = parsename(name)
 
-	scores := []float64{0.0, 0.0}
-	priors := c.priors()
-	total := 0.0
+	if c.data[Male].has(name) || c.data[Female].has(name) {
+		scores := []float64{0.0, 0.0}
+		priors := c.priors()
+		total := 0.0
 
-	scores[Male] = priors[Male] * c.data[Male].probability(name)
+		scores[Male] = priors[Male] * c.data[Male].probability(name)
 
-	total += scores[Male]
+		total += scores[Male]
 
-	scores[Female] = priors[Female] * c.data[Female].probability(name)
+		scores[Female] = priors[Female] * c.data[Female].probability(name)
 
-	total += scores[Female]
+		total += scores[Female]
 
-	if total > 0 {
-		scores[Male] /= total
-		scores[Female] /= total
+		if total > 0 {
+			scores[Male] /= total
+			scores[Female] /= total
+		}
+
+		// NOTE: If they are equal, we assume it's male. This is arbitrary, but
+		// we needed to do something.
+		if scores[Male] >= scores[Female] {
+			return Male, scores[Male]
+		}
+
+		return Female, scores[Female]
 	}
 
-	// NOTE: What about an "ambiguous" score or an unknown name?
-
-	if scores[Male] > scores[Female] {
-		return Male, scores[Male]
-	}
-
-	return Female, scores[Female]
+	return Unknown, 1.0
 }
 
 // New creates a new classifier that is ready to be used.
