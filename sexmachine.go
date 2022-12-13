@@ -81,13 +81,23 @@ func (c *Classifier) GobDecode(buf []byte) error {
 	return gob.NewDecoder(bytes.NewBuffer(buf)).Decode(&c.data)
 }
 
-// Train labels data and adds it to the classifier.
+// Train labels names within the classifier. This is useful if the
+// name and sex are known but not a quantity for the name.
 func (c *Classifier) Train(label sex, names ...string) {
 	for _, name := range names {
 		if d, ok := c.data[label]; ok {
 			d.freqs[normalize(name)]++
 			d.total++
 		}
+	}
+}
+
+// Observe labels data when the quantity of a name and its label are known. This
+// is a fairly common file format.
+func (c *Classifier) Observe(label sex, name string, quantity int) {
+	if d, ok := c.data[label]; ok {
+		d.freqs[normalize(name)] += float64(quantity)
+		d.total += float64(quantity)
 	}
 }
 

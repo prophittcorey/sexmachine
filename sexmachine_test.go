@@ -45,6 +45,26 @@ func TestClassification(t *testing.T) {
 	}
 }
 
+func TestClassificationWithObserve(t *testing.T) {
+	classifier := New()
+
+	classifier.Observe(Male, "Alex", 100)
+	classifier.Observe(Male, "Bob", 10)
+	classifier.Observe(Male, "Sam", 4)
+
+	classifier.Observe(Female, "Alex", 5)
+	classifier.Observe(Female, "Sally", 100)
+	classifier.Observe(Female, "Same", 1)
+
+	if sex, prob := classifier.Predict("Alex"); sex != Male {
+		t.Fatalf("failed to classify Alex as Male; got %v at %f", Sex(sex), prob)
+	}
+
+	if sex, prob := classifier.Predict("Sally"); sex != Female {
+		t.Fatalf("failed to classify Sara as Female; got %v at %f", Sex(sex), prob)
+	}
+}
+
 func TestSuite(t *testing.T) {
 	classifier := New()
 
