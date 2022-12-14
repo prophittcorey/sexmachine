@@ -127,5 +127,54 @@ func train(classifierfile, glob string) error {
 }
 
 func test(classifier *sexmachine.Classifier, testfile string) error {
+	f, err := os.Open(testfile)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer f.Close()
+
+	reader := csv.NewReader(f)
+
+	data, err := reader.ReadAll()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	sexes := map[byte]int{
+		'f': sexmachine.Female,
+		'm': sexmachine.Male,
+	}
+
+	var total int
+	var hit int
+	var miss int
+
+	for _, row := range data {
+		if len(row) < 2 {
+			continue
+		}
+
+		name, sex := row[0], strings.ToLower(row[1])
+
+		if len(sex) == 0 || (sex[0] != 'f' && sex[0] != 'm') {
+			continue
+		}
+
+		total++
+
+		prediction, _ := classifier.Predict(name)
+
+		if prediction == sexes[sex[0]] {
+			hit++
+		} else {
+			miss++
+		}
+	}
+
+	fmt.Printf("Got %d hits and %d misses (%.2f%% success).\n", hit, miss, (float64(hit)/float64(total))*100)
+
 	return nil
 }
