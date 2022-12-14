@@ -18,31 +18,45 @@ var (
 )
 
 func main() {
-	var classifier string
-	var data string
+	var classifierfile string
+	var datafile string
+	var testfile string
 	var check string
 
-	flag.StringVar(&classifier, "classifier", "", "a path to a classifier")
-	flag.StringVar(&data, "data", "", "one or more files to train a classifier with (csv: name,sex,frequency")
+	flag.StringVar(&classifierfile, "classifier", "", "a path to a classifier")
+	flag.StringVar(&datafile, "data", "", "one or more files to train a classifier with (csv: name,sex,frequency")
+	flag.StringVar(&testfile, "test", "", "a file to test the classifier against (csv: name,sex,frequency)")
 	flag.StringVar(&check, "check", "", "a name to check using the specified classifier")
 
 	flag.Parse()
 
-	if len(data) > 0 && len(classifier) > 0 {
-		if err := train(classifier, data); err != nil {
+	if len(datafile) > 0 && len(classifierfile) > 0 {
+		if err := train(classifierfile, datafile); err != nil {
 			log.Fatal(err)
 		}
 
 		return
 	}
 
-	if len(check) > 0 && len(classifier) > 0 {
-		c := sexmachine.New()
+	if len(check) > 0 && len(classifierfile) > 0 {
+		classifier := sexmachine.New()
 
-		if err := c.LoadFile(classifier); err == nil {
-			sex, prob := c.Predict(check)
+		if err := classifier.LoadFile(classifierfile); err == nil {
+			sex, prob := classifier.Predict(check)
 
 			fmt.Printf("%s is %s (%.2f%%)\n", check, sexmachine.Sex(sex), prob*100)
+		}
+
+		return
+	}
+
+	if len(testfile) > 0 && len(classifierfile) > 0 {
+		classifier := sexmachine.New()
+
+		if err := classifier.LoadFile(classifierfile); err == nil {
+			if err := test(classifier, testfile); err != nil {
+				log.Fatal(err)
+			}
 		}
 
 		return
@@ -51,7 +65,7 @@ func main() {
 	flag.Usage()
 }
 
-func train(classifierpath, glob string) error {
+func train(classifierfile, glob string) error {
 	files, err := filepath.Glob(glob)
 
 	if err != nil {
@@ -105,9 +119,13 @@ func train(classifierpath, glob string) error {
 		})()
 	}
 
-	if err = classifier.SaveFile(classifierpath); err != nil {
+	if err = classifier.SaveFile(classifierfile); err != nil {
 		return err
 	}
 
+	return nil
+}
+
+func test(classifier *sexmachine.Classifier, testfile string) error {
 	return nil
 }
