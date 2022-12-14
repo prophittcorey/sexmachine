@@ -20,15 +20,29 @@ var (
 func main() {
 	var classifier string
 	var data string
+	var check string
 
-	flag.StringVar(&classifier, "classifier", "", "a classifier to create (or update if it already exists)")
+	flag.StringVar(&classifier, "classifier", "", "a path to a classifier")
 	flag.StringVar(&data, "data", "", "one or more files to train a classifier with (csv: name,sex,frequency")
+	flag.StringVar(&check, "check", "", "a name to check using the specified classifier")
 
 	flag.Parse()
 
 	if len(data) > 0 && len(classifier) > 0 {
 		if err := train(classifier, data); err != nil {
 			log.Fatal(err)
+		}
+
+		return
+	}
+
+	if len(check) > 0 && len(classifier) > 0 {
+		c := sexmachine.New()
+
+		if err := c.LoadFile(classifier); err == nil {
+			sex, prob := c.Predict(check)
+
+			fmt.Printf("%s is %s (%.2f%%)\n", check, sexmachine.Sex(sex), prob*100)
 		}
 
 		return
@@ -49,8 +63,6 @@ func train(classifierpath, glob string) error {
 	}
 
 	classifier := sexmachine.New()
-
-	// TODO: load an existing classifier?
 
 	for _, f := range files {
 		(func() {
