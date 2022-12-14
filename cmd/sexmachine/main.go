@@ -19,47 +19,52 @@ var (
 
 func main() {
 	var classifierfile string
-	var datafile string
+	var trainingfile string
 	var testfile string
-	var check string
+	var predict string
 
 	flag.StringVar(&classifierfile, "classifier", "", "a path to a classifier")
-	flag.StringVar(&datafile, "data", "", "one or more files to train a classifier with (csv: name,sex,frequency")
+	flag.StringVar(&trainingfile, "train", "", "one or more files to train a classifier with (csv: name,sex,frequency")
 	flag.StringVar(&testfile, "test", "", "a file to test the classifier against (csv: name,sex,frequency)")
-	flag.StringVar(&check, "check", "", "a name to check using the specified classifier")
+	flag.StringVar(&predict, "predict", "", "a name to predict using the specified classifier")
 
 	flag.Parse()
 
-	if len(datafile) > 0 && len(classifierfile) > 0 {
-		if err := train(classifierfile, datafile); err != nil {
-			log.Fatal(err)
-		}
-
-		return
-	}
-
-	if len(check) > 0 && len(classifierfile) > 0 {
-		classifier := sexmachine.New()
-
-		if err := classifier.LoadFile(classifierfile); err == nil {
-			sex, prob := classifier.Predict(check)
-
-			fmt.Printf("%s is %s (%.2f%%)\n", check, sexmachine.Sex(sex), prob*100)
-		}
-
-		return
-	}
-
-	if len(testfile) > 0 && len(classifierfile) > 0 {
-		classifier := sexmachine.New()
-
-		if err := classifier.LoadFile(classifierfile); err == nil {
-			if err := test(classifier, testfile); err != nil {
+	if len(classifierfile) > 0 {
+		/* training */
+		if len(trainingfile) > 0 {
+			if err := train(classifierfile, trainingfile); err != nil {
 				log.Fatal(err)
 			}
+
+			return
 		}
 
-		return
+		/* testing */
+		if len(testfile) > 0 {
+			classifier := sexmachine.New()
+
+			if err := classifier.LoadFile(classifierfile); err == nil {
+				if err := test(classifier, testfile); err != nil {
+					log.Fatal(err)
+				}
+			}
+
+			return
+		}
+
+		/* checking */
+		if len(predict) > 0 {
+			classifier := sexmachine.New()
+
+			if err := classifier.LoadFile(classifierfile); err == nil {
+				sex, prob := classifier.Predict(predict)
+
+				fmt.Printf("%s is %s (%.2f%%)\n", predict, sexmachine.Sex(sex), prob*100)
+			}
+
+			return
+		}
 	}
 
 	flag.Usage()
