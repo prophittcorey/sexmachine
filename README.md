@@ -45,6 +45,30 @@ if sex, probability := classifier.Predict("Joey"); sex == sexmachine.Male {
 }
 ```
 
+## Tool Usage
+
+The `sexmachine` tool can be used to create and test classifiers.
+
+Installing the tool can be done through `go` tool.
+
+```bash
+$ go install github.com/prophittcorey/sexmachine/cmd/sexmachine@latest
+```
+
+First, we need some data. You can use `ssa.gov`'s free name dataset.
+
+```bash
+$ wget -O /tmp/names.zip https://www.ssa.gov/oact/babynames/names.zip
+$ unzip /tmp/names.zip -d /tmp/names/
+```
+
+Training a classifier and testing it out is easy.
+
+```bash
+$ sexmachine --train /tmp/names/*.txt --classifier /tmp/names/ssa.classifier
+$ sexmachine --classifier /tmp/names/ssa.classifier --predict "Bob" # bob is male (99.65%)
+```
+
 ## License
 
 The source code for this repository is licensed under the MIT license, which you can
