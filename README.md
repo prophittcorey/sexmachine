@@ -65,7 +65,7 @@ $ unzip /tmp/names.zip -d /tmp/names/
 Training a classifier and testing it out is easy.
 
 ```bash
-$ sexmachine --train /tmp/names/*.txt --classifier /tmp/names/ssa.classifier
+$ sexmachine --train "/tmp/names/*.txt" --classifier /tmp/names/ssa.classifier
 $ sexmachine --classifier /tmp/names/ssa.classifier --predict "Bob" # bob is male (99.65%)
 ```
 
