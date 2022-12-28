@@ -21,7 +21,7 @@ classifier.Train(Female, "tory", "tara", "joey", "sara", "joey")
 /* save */
 
 if err := classifier.SaveFile(os.TempDir() + "/sexmachine.classifier"); err != nil {
-  t.Fatalf("failed to write test file; %s", err)
+  t.Fatalf("failed to write classifier file; %s", err)
 }
 ```
 
@@ -35,7 +35,7 @@ classifier := New()
 /* load */
 
 if err := classifier.LoadFile(os.TempDir() + "/sexmachine.classifier"); err != nil {
-  t.Fatalf("failed to load test file; %s", err)
+  t.Fatalf("failed to load classifieclassifier file; %s", err)
 }
 
 /* test */
