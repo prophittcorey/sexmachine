@@ -9,7 +9,11 @@ A zero dependency, pure Golang package for the training and classification of na
 Training and saving a classifier.
 
 ```golang
-import "github.com/prophittcorey/sexmachine"
+import (
+    "log"
+
+    "github.com/prophittcorey/sexmachine"
+)
 
 classifier := New()
 
@@ -21,21 +25,25 @@ classifier.Train(Female, "tory", "tara", "joey", "sara", "joey")
 /* save */
 
 if err := classifier.SaveFile(os.TempDir() + "/sexmachine.classifier"); err != nil {
-  t.Fatalf("failed to write classifier file; %s", err)
+  log.Fatalf("failed to write classifier file; %s", err)
 }
 ```
 
 Loading and using a classifier.
 
 ```bash
-import "github.com/prophittcorey/sexmachine"
+import (
+    "log"
+
+    "github.com/prophittcorey/sexmachine"
+)
 
 classifier := New()
 
 /* load */
 
 if err := classifier.LoadFile(os.TempDir() + "/sexmachine.classifier"); err != nil {
-  t.Fatalf("failed to load classifieclassifier file; %s", err)
+  log.Fatalf("failed to load classifieclassifier file; %s", err)
 }
 
 /* test */
